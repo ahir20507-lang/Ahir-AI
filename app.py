@@ -12,27 +12,13 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-# કયા મોડેલ અવેલેબલ છે તે ચેક કરો
-try:
-    available_models = [
-        m.name for m in genai.list_models() 
-        if 'generateContent' in m.supported_generation_methods
-    ]
-    st.sidebar.write("તમારા ખાતામાં ઉપલબ્ધ મોડેલ:")
-    selected_model = st.sidebar.selectbox("મોડેલ પસંદ કરો", available_models)
-except Exception as e:
-    st.sidebar.error(f"કી ચેક કરવામાં એરર: {e}")
-    selected_model = None
-
 user_prompt = st.text_area("તમારો પ્રશ્ન પૂછો:")
 if st.button("મોકલો"):
-    if user_prompt and selected_model:
+    if user_prompt:
         with st.spinner("જવાબ વિચારી રહ્યો છું..."):
             try:
-                model = genai.GenerativeModel(selected_model)
+                model = genai.GenerativeModel("models/gemini-3.8-flash")
                 res = model.generate_content(user_prompt)
                 st.markdown(res.text)
             except Exception as e:
                 st.error(f"એરર: {e}")
-    elif not selected_model:
-        st.error("કોઈ મોડેલ મળ્યું નથી. API Key સાચી નથી અથવા પૂરતી પરવાનગી નથી.")
