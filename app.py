@@ -1,5 +1,5 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 from PIL import Image
 
 st.set_page_config(page_title="Ahir-AI", layout="centered")
@@ -14,7 +14,8 @@ if not api_key:
     st.info("ડાબી બાજુના મેનુમાં તમારી Gemini API Key નાખો.")
     st.stop()
 
-client = genai.Client(api_key=api_key)
+# Configure API
+genai.configure(api_key=api_key)
 
 tab1, tab2 = st.tabs(["💬 Chat", "🖼️ Image Analysis"])
 
@@ -25,10 +26,8 @@ with tab1:
         if user_prompt:
             with st.spinner("જવાબ વિચારી રહ્યો છું..."):
                 try:
-                    response = client.models.generate_content(
-                        model="gemini-1.5-flash",
-                        contents=user_prompt
-                    )
+                    model = genai.GenerativeModel("gemini-1.5-flash")
+                    response = model.generate_content(user_prompt)
                     st.markdown(response.text)
                 except Exception as e:
                     st.error(f"એરર: {e}")
@@ -47,10 +46,8 @@ with tab2:
         if st.button("એનાલિસિસ કરો"):
             with st.spinner("ફોટો જોઈ રહ્યો છું..."):
                 try:
-                    response = client.models.generate_content(
-                        model="gemini-1.5-flash",
-                        contents=[image, img_prompt]
-                    )
+                    model = genai.GenerativeModel("gemini-1.5-flash")
+                    response = model.generate_content([img_prompt, image])
                     st.markdown(response.text)
                 except Exception as e:
                     st.error(f"એરર: {e}")
